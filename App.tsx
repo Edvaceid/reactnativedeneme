@@ -4,7 +4,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } fr
 
 const { width } = Dimensions.get('window');
 
-const backgroundImage = require('./assets/background.jpg'); // Yerel arka plan resmi dosyasını ekliyoruz
+const backgroundImage = require('./assets/background2.jpg'); // Yerel arka plan resmi dosyasını ekliyoruz
 
 const App = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -60,6 +60,7 @@ const App = () => {
         <Text style={styles.subtitle}>En lezzetli kahve tarifleri için üye olun!</Text>
         <TextInput style={styles.input} placeholder="E-posta" keyboardType="email-address" placeholderTextColor="#bca383" />
         <TextInput style={styles.input} placeholder="Şifre" secureTextEntry placeholderTextColor="#bca383" />
+        <TextInput style={styles.input} placeholder="Şifreyi onayla" secureTextEntry placeholderTextColor="#bca383" />
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Kayıt Ol</Text>
         </TouchableOpacity>
