@@ -1,117 +1,132 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState } from 'react';
+import { Text, TextInput, StyleSheet, TouchableOpacity, Dimensions, ImageBackground } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const { width } = Dimensions.get('window');
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const backgroundImage = require('./assets/background.jpg'); // Yerel arka plan resmi dosyasını ekliyoruz
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const App = () => {
+  const [isLogin, setIsLogin] = useState(true);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  const loginCardX = useSharedValue(0);
+  const registerCardX = useSharedValue(width);
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const loginCardStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: loginCardX.value }],
+    };
+  });
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const registerCardStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: registerCardX.value }],
+    };
+  });
+
+  const toggleToRegister = () => {
+    setIsLogin(false);
+    loginCardX.value = withTiming(-width * 0.3, { duration: 300 }, () => {
+      loginCardX.value = withTiming(-width, { duration: 300 });
+      registerCardX.value = withSpring(0, { stiffness: 200 });
+    });
+  };
+
+  const toggleToLogin = () => {
+    setIsLogin(true);
+    registerCardX.value = withTiming(width * 0.3, { duration: 300 }, () => {
+      registerCardX.value = withTiming(width, { duration: 300 });
+      loginCardX.value = withSpring(0, { stiffness: 200 });
+    });
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <ImageBackground source={backgroundImage} style={styles.container}>
+      <Animated.View style={[styles.card, loginCardStyle]}>
+        <Text style={styles.title}>Giriş Yap</Text>
+        <Text style={styles.subtitle}>Kahve tariflerini keşfetmek için hemen giriş yapın!</Text>
+        <TextInput style={styles.input} placeholder="E-posta" keyboardType="email-address" placeholderTextColor="#bca383" />
+        <TextInput style={styles.input} placeholder="Şifre" secureTextEntry placeholderTextColor="#bca383" />
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Giriş Yap</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleToRegister}>
+          <Text style={styles.linkText}>Hesabınız yok mu? Kayıt olun</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      <Animated.View style={[styles.card, registerCardStyle]}>
+        <Text style={styles.title}>Kayıt Ol</Text>
+        <Text style={styles.subtitle}>En lezzetli kahve tarifleri için üye olun!</Text>
+        <TextInput style={styles.input} placeholder="E-posta" keyboardType="email-address" placeholderTextColor="#bca383" />
+        <TextInput style={styles.input} placeholder="Şifre" secureTextEntry placeholderTextColor="#bca383" />
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Kayıt Ol</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleToLogin}>
+          <Text style={styles.linkText}>Hesabınız var mı? Giriş yapın</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  card: {
+    position: 'absolute',
+    width: width * 0.8,
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(60, 42, 33, 0.9)', // Kahve tonlarında yarı saydam arka plan
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#fff',
+    textAlign: 'center',
   },
-  highlight: {
-    fontWeight: '700',
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: '#f7d8a0',
+    textAlign: 'center',
+  },
+  input: {
+    height: 50,
+    borderColor: '#7a5547',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    backgroundColor: '#fff8f0',
+    color: '#3c2a21',
+  },
+  button: {
+    backgroundColor: '#8b5e34',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  linkText: {
+    color: '#f7d8a0',
+    marginTop: 15,
+    textAlign: 'center',
   },
 });
 
